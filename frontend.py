@@ -67,6 +67,9 @@ page = st.sidebar.radio(
 st.sidebar.markdown("---")
 st.sidebar.markdown("### Filters")
 
+
+
+
 # Customers Page
 if page == "Customers":
     st.markdown("<div class='main-header'>Customer Management</div>", unsafe_allow_html=True)
@@ -105,7 +108,26 @@ if page == "Customers":
             st.write(f"**Address:** {customer_detail['Address']}")
             st.write(f"**Customer Type:** {customer_detail['Type']}")
             st.markdown("</div>", unsafe_allow_html=True)
+# deleting customer 
+if customers:
+    df_customers = pd.DataFrame(customers)
 
+    # Select Customer to Delete
+    selected_customer_id = st.selectbox(
+        "Select Customer to Delete",
+        options=df_customers['CustomerID'].tolist(),
+        format_func=lambda x: df_customers.loc[df_customers['CustomerID'] == x, 'Name'].iloc[0]
+    )
+
+    # Delete Button
+    if st.button("Delete Customer", key="delete_customer"):
+        try:
+            response = requests.delete(f"{API_BASE_URL}/customers/{selected_customer_id}")
+            response.raise_for_status()
+            st.success("Customer deleted successfully!")
+            st.experimental_rerun()  # Refresh the page to update the customer list
+        except requests.exceptions.RequestException as e:
+            st.error(f"Error deleting customer: {e}")
 # Parcels Page
 elif page == "Parcels":
     st.markdown("<div class='main-header'>Parcel Management</div>", unsafe_allow_html=True)
