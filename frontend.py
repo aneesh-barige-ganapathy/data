@@ -105,6 +105,37 @@ if page == "Customers":
             st.write(f"**Address:** {customer_detail['Address']}")
             st.write(f"**Customer Type:** {customer_detail['Type']}")
             st.markdown("</div>", unsafe_allow_html=True)
+# Customer details section
+st.markdown("<div class='sub-header'>Customer Details</div>", unsafe_allow_html=True)
+
+selected_customer_id = st.selectbox(
+    "Select Customer to View Details",
+    options=df_customers['CustomerID'].tolist(),
+    format_func=lambda x: df_customers.loc[df_customers['CustomerID'] == x, 'Name'].iloc[0]
+)
+
+customer_detail = fetch_api_data(f"/customers/{selected_customer_id}")
+
+if customer_detail:
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.write(f"**Name:** {customer_detail['Name']}")
+    st.write(f"**Email:** {customer_detail['Email']}")
+    st.write(f"**Phone:** {customer_detail['Phone']}")
+    st.write(f"**Address:** {customer_detail['Address']}")
+    st.write(f"**Customer Type:** {customer_detail['Type']}")
+    st.markdown("</div>", unsafe_allow_html=True)
+    
+    # Add delete button with confirmation
+    if st.button("Delete Customer", key="delete_customer"):
+        confirm = st.checkbox("Are you sure you want to delete this customer?")
+        if confirm:
+            response = requests.delete(f"{API_BASE_URL}/customers/{selected_customer_id}")
+            if response.status_code == 200:
+                st.success("Customer deleted successfully!")
+                # Refresh the page to update the customer list
+                st.experimental_rerun()
+            else:
+                st.error(f"Error deleting customer: {response.json().get('detail', 'Unknown error')}")
 
 # Parcels Page
 elif page == "Parcels":
