@@ -216,3 +216,5 @@ st.markdown(
     """, 
     unsafe_allow_html=True
 )
+
+# command to run the app: streamlit run frontend.py
